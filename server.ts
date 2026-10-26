@@ -32,9 +32,11 @@ function getAiClient(): GoogleGenAI {
 }
 
 const ACTIVE_GEMINI_MODELS = [
+  'gemini-2.5-flash',
+  'gemini-flash-latest',
+  'gemini-3.5-flash',
   'gemini-3.1-flash-lite',
   'gemini-3.5-flash-lite',
-  'gemini-3.5-flash',
 ]
 
 async function startServer() {
@@ -327,7 +329,7 @@ async function startServer() {
               },
             }),
             new Promise<never>((_, reject) =>
-              setTimeout(() => reject(new Error('Gemini model timeout')), 2500)
+              setTimeout(() => reject(new Error('Gemini model timeout')), 3000)
             ),
           ])
           if (response.text) {
@@ -336,8 +338,8 @@ async function startServer() {
             break
           }
         } catch {
-          // Try next active model or fall back to fast smart blueprint
-          break
+          // Try next active model in the fallback chain
+          continue
         }
       }
 

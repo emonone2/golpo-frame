@@ -116,7 +116,7 @@ export class GeminiFreeCartoonAdapter implements ImageGeneratorAdapter {
 
       try {
         const timeoutController = new AbortController()
-        const timeoutId = setTimeout(() => timeoutController.abort(), 3500)
+        const timeoutId = setTimeout(() => timeoutController.abort(), 3800)
         if (signal) {
           signal.addEventListener('abort', () => timeoutController.abort(), { once: true })
         }
