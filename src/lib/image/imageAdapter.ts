@@ -1,4 +1,9 @@
 import type { CharacterPose, ComicSetting, GenreId } from '../../types'
+import {
+  buildSmartDefaultBlueprint,
+  composeBanglaCartoonSvg,
+  encodeSvgToDataUri,
+} from './banglaCartoonComposer'
 
 export type GenerationStage = 'scene' | 'background' | 'character' | 'finishing'
 
@@ -55,6 +60,8 @@ function stageForPercent(percent: number): GenerationStage {
 
 /**
  * Free Google Gemini AI High-Detail Bangla Cartoon Image Adapter (~5-7 seconds with smooth 0-100% progress).
+ * Works on both full-stack servers (/api/gemini/cartoon-image) AND static deployments (Vercel, Netlify, GitHub Pages)
+ * by falling back to the client-side Multi-Layered Bangla Cartoon Composer if the server route is unreachable.
  */
 export class GeminiFreeCartoonAdapter implements ImageGeneratorAdapter {
   id = 'gemini-free-cartoon'
@@ -77,7 +84,7 @@ export class GeminiFreeCartoonAdapter implements ImageGeneratorAdapter {
     emit(5, 'scene')
 
     const startTime = Date.now()
-    const targetDurationMs = 5400 // ~5.4 seconds smooth 4-stage animation
+    const targetDurationMs = 5200 // ~5.2 seconds smooth 4-stage animation
 
     const timer = setInterval(() => {
       const elapsed = Date.now() - startTime
@@ -88,49 +95,64 @@ export class GeminiFreeCartoonAdapter implements ImageGeneratorAdapter {
       }
     }, 180)
 
+    const payload = {
+      prompt: req.prompt.trim() || 'Bangladeshi student life cartoon scene',
+      setting: req.setting,
+      pose: req.pose,
+      genre: req.genre,
+      characterName: req.characterName || 'Rafi',
+      characterPreset: req.characterPreset,
+      dialogue: req.dialogue || '',
+      caption: req.caption || '',
+      colors: req.colors,
+      width: req.width || 400,
+      height: req.height || 500,
+    }
+
     try {
-      const response = await fetch('/api/gemini/cartoon-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: req.prompt.trim() || 'Bangladeshi student life cartoon scene',
-          setting: req.setting,
-          pose: req.pose,
-          genre: req.genre,
-          characterName: req.characterName || 'Rafi',
-          characterPreset: req.characterPreset,
-          dialogue: req.dialogue || '',
-          caption: req.caption || '',
-          colors: req.colors,
-          width: req.width || 400,
-          height: req.height || 500,
-        }),
-        signal,
-      })
+      let generatedImageUrl: string | null = null
 
-      if (!response.ok) {
-        let errMsg = `Gemini API HTTP ${response.status}`
-        try {
-          const errBody = (await response.json()) as { error?: string }
-          if (errBody?.error) errMsg = errBody.error
-        } catch {
-          // ignore JSON parse error
+      try {
+        const response = await fetch('/api/gemini/cartoon-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal,
+        })
+
+        if (response.ok) {
+          const data = (await response.json()) as { imageUrl?: string }
+          if (data && typeof data.imageUrl === 'string' && data.imageUrl.length > 0) {
+            generatedImageUrl = data.imageUrl
+          }
         }
-        throw new Error(errMsg)
+      } catch {
+        // Deployed on a static host (Vercel / Netlify / GitHub Pages) or offline — use client-side multi-layered composer below
       }
 
-      const data = (await response.json()) as { imageUrl?: string }
-      if (data && typeof data.imageUrl === 'string' && data.imageUrl.length > 0) {
-        // Ensure smooth completion through remaining stages if API responded faster than 5s
-        const remainingMs = Math.max(0, targetDurationMs - (Date.now() - startTime))
-        if (remainingMs > 0) {
-          await new Promise<void>((resolve) => setTimeout(resolve, remainingMs))
-        }
-        emit(100, 'finishing')
-        return data.imageUrl
+      if (!generatedImageUrl) {
+        const blueprint = buildSmartDefaultBlueprint({
+          prompt: payload.prompt,
+          dialogue: payload.dialogue,
+          caption: payload.caption,
+          setting: payload.setting,
+          pose: payload.pose,
+          genre: payload.genre,
+          characterName: payload.characterName,
+          characterPreset: payload.characterPreset,
+          colors: payload.colors,
+        })
+        const richSvg = composeBanglaCartoonSvg(blueprint)
+        generatedImageUrl = encodeSvgToDataUri(richSvg)
       }
 
-      throw new Error('Invalid response from Google Gemini cartoon endpoint')
+      // Ensure smooth completion through remaining stages so the user sees the 0% -> 100% animation
+      const remainingMs = Math.max(0, targetDurationMs - (Date.now() - startTime))
+      if (remainingMs > 0) {
+        await new Promise<void>((resolve) => setTimeout(resolve, remainingMs))
+      }
+      emit(100, 'finishing')
+      return generatedImageUrl
     } finally {
       clearInterval(timer)
     }
