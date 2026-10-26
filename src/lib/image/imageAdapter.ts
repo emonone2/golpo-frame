@@ -95,6 +95,7 @@ export class GeminiFreeCartoonAdapter implements ImageGeneratorAdapter {
       }
     }, 180)
 
+    const variationSeed = Date.now()
     const payload = {
       prompt: req.prompt.trim() || 'Bangladeshi student life cartoon scene',
       setting: req.setting,
@@ -107,6 +108,7 @@ export class GeminiFreeCartoonAdapter implements ImageGeneratorAdapter {
       colors: req.colors,
       width: req.width || 400,
       height: req.height || 500,
+      variationSeed,
     }
 
     try {
@@ -141,6 +143,7 @@ export class GeminiFreeCartoonAdapter implements ImageGeneratorAdapter {
           characterName: payload.characterName,
           characterPreset: payload.characterPreset,
           colors: payload.colors,
+          variationSeed,
         })
         const richSvg = composeBanglaCartoonSvg(blueprint)
         generatedImageUrl = encodeSvgToDataUri(richSvg)

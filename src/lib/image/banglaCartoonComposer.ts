@@ -1564,12 +1564,15 @@ export function buildSmartDefaultBlueprint(opts: {
   characterName: string
   characterPreset?: string
   colors?: Record<string, unknown>
+  variationSeed?: number
 }): BanglaCartoonBlueprint {
+  const seed = typeof opts.variationSeed === 'number' ? Math.abs(Math.floor(opts.variationSeed)) : 0
   const fullText = `${opts.prompt} ${opts.dialogue} ${opts.caption} ${opts.characterName}`.toLowerCase()
   const environment = detectEnvironmentFromAllText(opts.setting, fullText)
   const detectedPose = detectPoseFromAllText(opts.pose, fullText)
 
-  let skyTheme: SkyTheme = 'sunny_dhaka'
+  const skyVariations: SkyTheme[] = ['golden_sunset', 'sunny_dhaka', 'pastel_morning', 'neon_evening']
+  let skyTheme: SkyTheme = skyVariations[seed % skyVariations.length]
   if (environment === 'rainy_street') skyTheme = 'monsoon_storm'
   else if (
     environment === 'dhaka_rooftop' ||
@@ -1616,6 +1619,10 @@ export function buildSmartDefaultBlueprint(opts: {
     heldProp = 'cricket_bat'
   else if (/গোলাপ|ফুল|rose|flower/.test(fullText)) heldProp = 'rose'
   else if (/ফোন|মোবাইল|সেলফি|phone|mobile/.test(fullText)) heldProp = 'phone'
+  else {
+    const defaultProps: HeldProp[] = ['tea_cup', 'book', 'phone', 'rose']
+    heldProp = defaultProps[seed % defaultProps.length]
+  }
 
   let emotionEffect: EmotionEffect = 'none'
   if (detectedPose === 'shocked') emotionEffect = 'shock_bolts'
@@ -1630,7 +1637,7 @@ export function buildSmartDefaultBlueprint(opts: {
   const hasTwoPeople =
     /দুজনে|দুইজন|বন্ধু|সাথে|রাফি|নুসরাত|আড্ডা|মামা|স্যার|খালা|রিকশা|together|both|friends|and|with/.test(
       fullText
-    )
+    ) || seed % 2 === 0
 
   const secondaryPreset: CharacterStyleId =
     preset === 'rafi'
@@ -1647,7 +1654,23 @@ export function buildSmartDefaultBlueprint(opts: {
 
   const secondaryIsFemale = secondaryPreset === 'nusrat'
 
-  const foregroundProps: ForegroundPropId[] = ['stray_cat', 'flying_birds']
+  const malePalettes: [string, string][] = [
+    ['#2563eb', '#facc15'],
+    ['#059669', '#fde047'],
+    ['#7c3aed', '#fb923c'],
+    ['#dc2626', '#fef08a'],
+  ]
+  const femalePalettes: [string, string][] = [
+    ['#e11d48', '#f59e0b'],
+    ['#db2777', '#fde047'],
+    ['#9333ea', '#38bdf8'],
+    ['#0d9488', '#fb7185'],
+  ]
+  const [defaultPri, defaultSec] = isFemale
+    ? femalePalettes[seed % femalePalettes.length]
+    : malePalettes[seed % malePalettes.length]
+
+  const foregroundProps: ForegroundPropId[] = ['stray_cat', 'flying_birds', 'fairy_lights']
   if (/বিরিয়ানি|কাচ্চি|খাবার|biryani|lunch|dinner/.test(fullText)) {
     foregroundProps.unshift('biryani_table')
   } else if (environment === 'tong_tea_stall' || /চা|সিঙ্গারা|টং|tea/.test(fullText)) {
@@ -1686,8 +1709,8 @@ export function buildSmartDefaultBlueprint(opts: {
       scale: hasTwoPeople ? 0.98 : 1.06,
       skinColor: String(opts.colors?.skinColor || (isFemale ? '#eab68c' : '#e5a97c')),
       hairColor: String(opts.colors?.hairColor || '#18181b'),
-      primaryColor: String(opts.colors?.primaryColor || (isFemale ? '#e11d48' : '#2563eb')),
-      secondaryColor: String(opts.colors?.secondaryColor || (isFemale ? '#f59e0b' : '#facc15')),
+      primaryColor: String(opts.colors?.primaryColor || defaultPri),
+      secondaryColor: String(opts.colors?.secondaryColor || defaultSec),
       hasGlasses: Boolean(opts.colors?.hasGlasses ?? (preset === 'nusrat' || preset === 'teacher')),
       hasBeard: Boolean(
         opts.colors?.hasBeard ??
