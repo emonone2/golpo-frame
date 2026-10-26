@@ -32,10 +32,9 @@ function getAiClient(): GoogleGenAI {
 }
 
 const ACTIVE_GEMINI_MODELS = [
-  'gemini-3.5-flash',
   'gemini-3.1-flash-lite',
   'gemini-3.5-flash-lite',
-  'gemini-3-flash-preview',
+  'gemini-3.5-flash',
 ]
 
 async function startServer() {
@@ -314,22 +313,31 @@ async function startServer() {
       let usedModel = ACTIVE_GEMINI_MODELS[0]
       for (const candidateModel of ACTIVE_GEMINI_MODELS) {
         try {
-          const response = await ai.models.generateContent({
-            model: candidateModel,
-            contents: userPromptText,
-            config: {
-              systemInstruction: artDirectorSystemInstruction,
-              responseMimeType: 'application/json',
-              responseSchema,
-            },
-          })
+          const response = await Promise.race([
+            ai.models.generateContent({
+              model: candidateModel,
+              contents: userPromptText,
+              config: {
+                systemInstruction: artDirectorSystemInstruction,
+                responseMimeType: 'application/json',
+                responseSchema,
+                thinkingConfig: {
+                  thinkingLevel: ThinkingLevel.LOW,
+                },
+              },
+            }),
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error('Gemini model timeout')), 2500)
+            ),
+          ])
           if (response.text) {
             responseText = response.text
             usedModel = candidateModel
             break
           }
         } catch {
-          // Try next active model in the fallback chain
+          // Try next active model or fall back to fast smart blueprint
+          break
         }
       }
 

@@ -72,7 +72,7 @@ export class GeminiFreeCartoonAdapter implements ImageGeneratorAdapter {
   }
 
   async generatePanelIllustration(req: GenerateImageRequest, signal?: AbortSignal): Promise<string> {
-    let currentPercent = 5
+    let currentPercent = 8
     const emit = (p: number, s?: GenerationStage) => {
       currentPercent = Math.max(currentPercent, Math.min(100, Math.round(p)))
       req.onProgress?.({
@@ -81,19 +81,19 @@ export class GeminiFreeCartoonAdapter implements ImageGeneratorAdapter {
       })
     }
 
-    emit(5, 'scene')
+    emit(8, 'scene')
 
     const startTime = Date.now()
-    const targetDurationMs = 5200 // ~5.2 seconds smooth 4-stage animation
+    const targetDurationMs = 2400 // ~2.4 seconds fast, smooth 4-stage animation
 
     const timer = setInterval(() => {
       const elapsed = Date.now() - startTime
-      const ratio = Math.min(0.96, elapsed / targetDurationMs)
-      const nextPercent = Math.max(currentPercent + 1, Math.round(5 + ratio * 92))
-      if (nextPercent <= 97) {
+      const ratio = Math.min(0.95, elapsed / targetDurationMs)
+      const nextPercent = Math.max(currentPercent + 1, Math.round(8 + ratio * 88))
+      if (nextPercent <= 96) {
         emit(nextPercent)
       }
-    }, 180)
+    }, 120)
 
     const variationSeed = Date.now()
     const payload = {
@@ -115,21 +115,31 @@ export class GeminiFreeCartoonAdapter implements ImageGeneratorAdapter {
       let generatedImageUrl: string | null = null
 
       try {
-        const response = await fetch('/api/gemini/cartoon-image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-          signal,
-        })
+        const timeoutController = new AbortController()
+        const timeoutId = setTimeout(() => timeoutController.abort(), 3500)
+        if (signal) {
+          signal.addEventListener('abort', () => timeoutController.abort(), { once: true })
+        }
 
-        if (response.ok) {
-          const data = (await response.json()) as { imageUrl?: string }
-          if (data && typeof data.imageUrl === 'string' && data.imageUrl.length > 0) {
-            generatedImageUrl = data.imageUrl
+        try {
+          const response = await fetch('/api/gemini/cartoon-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: timeoutController.signal,
+          })
+
+          if (response.ok) {
+            const data = (await response.json()) as { imageUrl?: string }
+            if (data && typeof data.imageUrl === 'string' && data.imageUrl.length > 0) {
+              generatedImageUrl = data.imageUrl
+            }
           }
+        } finally {
+          clearTimeout(timeoutId)
         }
       } catch {
-        // Deployed on a static host (Vercel / Netlify / GitHub Pages) or offline — use client-side multi-layered composer below
+        // Timeout, offline, or static host — immediately fall back to client-side multi-layered composer below
       }
 
       if (!generatedImageUrl) {
@@ -149,8 +159,8 @@ export class GeminiFreeCartoonAdapter implements ImageGeneratorAdapter {
         generatedImageUrl = encodeSvgToDataUri(richSvg)
       }
 
-      // Ensure smooth completion through remaining stages so the user sees the 0% -> 100% animation
-      const remainingMs = Math.max(0, targetDurationMs - (Date.now() - startTime))
+      // Ensure smooth completion through remaining stages without ever stalling
+      const remainingMs = Math.max(0, Math.min(1200, targetDurationMs - (Date.now() - startTime)))
       if (remainingMs > 0) {
         await new Promise<void>((resolve) => setTimeout(resolve, remainingMs))
       }
