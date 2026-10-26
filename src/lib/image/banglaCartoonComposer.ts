@@ -1486,24 +1486,72 @@ export function composeBanglaCartoonSvg(blueprint: BanglaCartoonBlueprint): stri
 
 function detectEnvironmentFromAllText(setting: string, text: string): BanglaEnvironment {
   const combined = `${text}`.toLowerCase()
-  if (/গ্রাম|উঠান|কুঁড়েঘর|পিঠা|ধান|কলাগাছ|village|courtyard|hut|pitha/.test(combined))
+  // Text content ALWAYS takes priority when user writes a scene/dialogue/caption in Bangla, Banglish, or English
+  if (
+    /নদী|নৌকা|ঘাট|কাশফুল|মাঝি|পদ্মা|মেঘনা|যমুনা|পানি|সাগর|বিল|হাওর|পুকুর|পাড়|তীর|\bnodi\b|\bnouka\b|\bghat\b|\bmajhi\b|\bpadma\b|\bpani\b|\bsagor\b|\bpukur\b|\bhaor\b|\bbil\b|\briver\b|\bboat\b|\bkashful\b|\blake\b|\bpond\b|\bwater\b/.test(
+      combined
+    )
+  )
+    return 'river_nouka'
+  if (
+    /গ্রাম|উঠান|কুঁড়েঘর|পিঠা|ধান|কলাগাছ|মাটির ঘর|ক্ষেত|পাহাড়|বন|জঙ্গল|\bgram\b|\bgrame\b|\bpahar\b|\bbon\b|\bjangal\b|\bkhet\b|\bpitha\b|\bvillage\b|\bcourtyard\b|\bhut\b|\bhill\b|\bforest\b/.test(
+      combined
+    )
+  )
     return 'village_courtyard'
-  if (/ছাদ|সূর্যাস্ত|ঘুড়ি|রেলিং|rooftop|roof|kite/.test(combined)) return 'dhaka_rooftop'
-  if (/চা|টং|ক্যান্টিন|সিঙ্গারা|বিরিয়ানি|কাচ্চি|tea|tong|canteen|stall|biryani/.test(combined))
+  if (
+    /বৃষ্টি|বাদল|মেঘ|ঝড়|ছাতা|বর্ষা|ভেজা|\bbristi\b|\bbrishti\b|\bmegh\b|\bjhor\b|\bchhata\b|\bchata\b|\brain\b|\bmonsoon\b|\bumbrella\b|\bpuddle\b|\bstorm\b/.test(
+      combined
+    )
+  )
+    return 'rainy_street'
+  if (
+    /ছাদ|সূর্যাস্ত|ঘুড়ি|রেলিং|\bchhad\b|\bchad\b|\bghuri\b|\bsurjasto\b|\brooftop\b|\broof\b|\bkite\b/.test(
+      combined
+    )
+  )
+    return 'dhaka_rooftop'
+  if (
+    /চা|টং|ক্যান্টিন|সিঙ্গারা|বিরিয়ানি|কাচ্চি|হোটেল|রেস্টুরেন্ট|\bcha\b|\btong\b|\bcanteen\b|\bsingara\b|\bbiryani\b|\bkacchi\b|\btea\b|\bstall\b|\bcafe\b/.test(
+      combined
+    )
+  )
     return 'tong_tea_stall'
-  if (/বৃষ্টি|বাদল|মেঘ|ঝড়|ছাতা|rain|monsoon|umbrella|puddle|storm/.test(combined)) return 'rainy_street'
-  if (/রিকশা|প্যাডেল|হুড|ভাড়া|rickshaw/.test(combined)) return 'rickshaw_ride'
-  if (/নদী|নৌকা|ঘাট|কাশফুল|মাঝি|পদ্মা|river|boat|nouka|kashful/.test(combined)) return 'river_nouka'
-  if (/ফুচকা|চটপটি|তেঁতুল|টক|fuchka|chotpoti/.test(combined)) return 'fuchka_cart'
-  if (/পরীক্ষা|ক্লাস|বোর্ড|কুইজ|খাতা|classroom|exam|class|blackboard|quiz/.test(combined))
+  if (/রিকশা|প্যাডেল|হুড|ভাড়া|\brickshaw\b|\briksha\b|\brikshaw\b/.test(combined))
+    return 'rickshaw_ride'
+  if (/ফুচকা|চটপটি|তেঁতুল|টক|ঝালমুড়ি|\bfuchka\b|\bphuchka\b|\bchotpoti\b|\bjhalmuri\b/.test(combined))
+    return 'fuchka_cart'
+  if (
+    /পরীক্ষা|ক্লাস|বোর্ড|কুইজ|খাতা|স্কুল|কলেজ|\bporikkha\b|\bexam\b|\bclassroom\b|\bclass\b|\bblackboard\b|\bquiz\b|\bschool\b/.test(
+      combined
+    )
+  )
     return 'classroom_exam'
-  if (/হোস্টেল|রাত|ল্যাপটপ|অ্যাসাইনমেন্ট|hostel|assignment/.test(combined)) return 'hostel_night'
-  if (/ঘর|বিছানা|রুম|ঘুম|কম্বল|bedroom|room|bed|sleep/.test(combined)) return 'bedroom_lazy'
-  if (/লাইব্রেরি|বইঘর|library|bookshelf/.test(combined)) return 'library_study'
-  if (/মাঠ|ক্রিকেট|ফুটবল|খেলা|ব্যাট|field|cricket|football/.test(combined)) return 'cricket_field'
-  if (/বাস|জ্যাম|কন্ডাকটর|সিট|bus|traffic/.test(combined)) return 'dhaka_bus'
-  if (/টিএসসি|বটতলা|আড্ডা|tsc|bottola/.test(combined)) return 'tsc_bottola'
-  if (/গেট|দারোয়ান|gate|guard/.test(combined)) return 'college_gate'
+  if (
+    /হোস্টেল|রাত|ল্যাপটপ|অ্যাসাইনমেন্ট|ডেডলাইন|\bhostel\b|\braat\b|\blaptop\b|\bassignment\b|\bdeadline\b/.test(
+      combined
+    )
+  )
+    return 'hostel_night'
+  if (
+    /ঘর|বিছানা|রুম|ঘুম|কম্বল|বাসা|সোফা|\bghor\b|\bbasha\b|\bbichhana\b|\bghum\b|\bbedroom\b|\broom\b|\bbed\b|\bsleep\b/.test(
+      combined
+    )
+  )
+    return 'bedroom_lazy'
+  if (/লাইব্রেরি|বইঘর|পড়ার টেবিল|\blibrary\b|\bbookshelf\b|\bboi\b/.test(combined))
+    return 'library_study'
+  if (
+    /মাঠ|ক্রিকেট|ফুটবল|খেলা|ব্যাট|বল|গোল|\bmath\b|\bkhela\b|\bcricket\b|\bfootball\b|\bfield\b|\bstadium\b/.test(
+      combined
+    )
+  )
+    return 'cricket_field'
+  if (/বাস|জ্যাম|কন্ডাকটর|সিট|রাস্তা|ট্রাফিক|\bbus\b|\bjam\b|\btraffic\b|\brasta\b|\brastay\b/.test(combined))
+    return 'dhaka_bus'
+  if (/টিএসসি|বটতলা|আড্ডা|বাজার|হাট|\btsc\b|\bbottola\b|\badda\b|\bbazar\b|\bhaat\b/.test(combined))
+    return 'tsc_bottola'
+  if (/গেট|দারোয়ান|\bgate\b|\bguard\b|\bdarowan\b/.test(combined)) return 'college_gate'
 
   switch (setting) {
     case 'rooftop':
@@ -1541,17 +1589,142 @@ function detectEnvironmentFromAllText(setting: string, text: string): BanglaEnvi
 
 function detectPoseFromAllText(pose: string, text: string): CartoonPoseId {
   const t = text.toLowerCase()
-  if (/আতঙ্ক|শক|হায় হায়|সর্বনাশ|কী|অবাক|ভয়|shock|panic|omg|what|terror/.test(t)) return 'shocked'
-  if (/রাগ|রেগে|চিৎকার|ধমক|বিরক্ত|angry|rage|mad|furious|shout/.test(t)) return 'angry'
-  if (/কান্না|চোখের পানি|কাঁদছে|দুঃখ|মন খারাপ|cry|tears|sad|sob/.test(t)) return 'crying'
-  if (/ভাবনা|চিন্তা|ভাবছি|কেন|কীভাবে|হুমম|think|wonder|hmm|question/.test(t)) return 'thinking'
-  if (/ইয়াাহু|আনন্দ|জিতেছি|পার্টি|খুশি|উৎসব|celebrate|yahoo|yay|win|happy/.test(t)) return 'celebrating'
-  if (/নাচ|গান|উৎসব|dance|music|sing/.test(t)) return 'dancing'
-  if (/দৌড়|ছুট|তাড়াহুড়ো|দেরি|run|sprint|rush|late/.test(t)) return 'running'
-  if (/ফিসফিস|গোপন|চুপিচুপি|whisper|secret/.test(t)) return 'whispering'
-  if (/আত্মবিশ্বাসী|রেডি|প্ল্যান|confident|ready|sure/.test(t)) return 'confident'
+  if (/আতঙ্ক|শক|হায় হায়|সর্বনাশ|কী|অবাক|ভয়|\bobak\b|\bbhoy\b|\bshock\b|\bpanic\b|\bomg\b|\bwhat\b|\bterror\b/.test(t))
+    return 'shocked'
+  if (/রাগ|রেগে|চিৎকার|ধমক|বিরক্ত|\brag\b|\brege\b|\bchitkar\b|\bangry\b|\brage\b|\bmad\b|\bfurious\b|\bshout\b/.test(t))
+    return 'angry'
+  if (/কান্না|চোখের পানি|কাঁদছে|দুঃখ|মন খারাপ|\bkanna\b|\bkandche\b|\bdukkho\b|\bmon kharap\b|\bcry\b|\btears\b|\bsad\b|\bsob\b/.test(t))
+    return 'crying'
+  if (/ভাবনা|চিন্তা|ভাবছি|কেন|কীভাবে|হুমম|\bchinta\b|\bbhabchi\b|\bkeno\b|\bthink\b|\bwonder\b|\bhmm\b|\bquestion\b/.test(t))
+    return 'thinking'
+  if (/ইয়াাহু|আনন্দ|জিতেছি|পার্টি|খুশি|উৎসব|\banondo\b|\bkhushi\b|\bjitechi\b|\bcelebrate\b|\byahoo\b|\byay\b|\bwin\b|\bhappy\b/.test(t))
+    return 'celebrating'
+  if (/নাচ|গান|উৎসব|\bnach\b|\bgan\b|\bdance\b|\bmusic\b|\bsing\b/.test(t)) return 'dancing'
+  if (/দৌড়|ছুট|তাড়াহুড়ো|দেরি|পালা|\bdour\b|\bpala\b|\bderi\b|\brun\b|\bsprint\b|\brush\b|\blate\b/.test(t))
+    return 'running'
+  if (/ফিসফিস|গোপন|চুপিচুপি|\bgopon\b|\bchupichupi\b|\bwhisper\b|\bsecret\b/.test(t))
+    return 'whispering'
+  if (/আত্মবিশ্বাসী|রেডি|প্ল্যান|\bready\b|\bplan\b|\bconfident\b|\bsure\b/.test(t)) return 'confident'
   if (pose && pose !== 'idle') return pose as CartoonPoseId
   return 'talking'
+}
+
+/**
+ * Synthesizes custom midground SVG illustrations directly from keywords in the user's Scene/Dialogue/Caption
+ * so every unique description renders distinct visual objects in the scene.
+ */
+function buildCustomMidgroundSvgFromText(fullText: string, env: BanglaEnvironment, seed: number): string {
+  const parts: string[] = []
+
+  // Mountains / Hills (পাহাড় / pahar / hill)
+  if (/পাহাড়|পর্বত|টিলা|\bpahar\b|\bhill\b|\bmountain\b/.test(fullText)) {
+    parts.push(`
+      <g id="custom-hills" stroke="#1a1423" stroke-width="2.8">
+        <polygon points="-10,275 85,135 190,275" fill="#15803d" />
+        <polygon points="85,135 125,188 65,195" fill="#4ade80" stroke="none" opacity="0.55" />
+        <polygon points="135,275 255,115 375,275" fill="#166534" />
+        <polygon points="255,115 290,165 225,172" fill="#86efac" stroke="none" opacity="0.5" />
+        <polygon points="280,275 365,160 420,275" fill="#14532d" />
+      </g>
+    `)
+  }
+
+  // Extra River / Boat / Water waves if river or water mentioned
+  if (
+    env === 'river_nouka' ||
+    /নদী|নৌকা|ঘাট|পানি|সাগর|পুকুর|\bnodi\b|\bnouka\b|\bpani\b|\bsagor\b|\bpukur\b|\briver\b|\bboat\b/.test(
+      fullText
+    )
+  ) {
+    const boatOffset = (seed % 3) * 18
+    parts.push(`
+      <g id="custom-river-details">
+        <!-- Distant Second Sailboat on the River -->
+        <g transform="translate(${62 + boatOffset}, 212) scale(0.78)" stroke="#1a1423" stroke-width="2.4">
+          <path d="M 0 38 L 95 38 L 78 56 L 18 56 Z" fill="#78350f" />
+          <path d="M 28 38 Q 48 16 68 38 Z" fill="#d97706" />
+          <line x1="48" y1="38" x2="48" y2="-18" stroke="#1a1423" stroke-width="2.8" />
+          <polygon points="48,-16 88,22 48,28" fill="#f43f5e" />
+          <polygon points="46,-12 18,22 46,26" fill="#fef08a" />
+        </g>
+        <!-- Shimmering River Ripples & Jumping Hilsa Fish (ইলিশ মাছ) -->
+        <g stroke="#e0f2fe" stroke-width="2.2" fill="none" stroke-linecap="round">
+          <path d="M 24 315 Q 52 308 80 315 T 136 315" />
+          <path d="M 245 335 Q 275 328 305 335 T 365 335" />
+        </g>
+        <g transform="translate(182, 298) rotate(-18)" stroke="#1a1423" stroke-width="1.8">
+          <path d="M 0 0 Q 16 -10 32 0 Q 16 10 0 0 Z" fill="#e2e8f0" />
+          <polygon points="30,0 40,-7 38,0 40,7" fill="#94a3b8" />
+          <circle cx="7" cy="-1" r="1.5" fill="#1a1423" />
+        </g>
+      </g>
+    `)
+  }
+
+  // Rainbow (রংধনু / rongdhonu / rainbow)
+  if (/রংধনু|রঙধনু|\brongdhonu\b|\brainbow\b/.test(fullText)) {
+    parts.push(`
+      <g id="custom-rainbow" fill="none" stroke-width="6" opacity="0.78">
+        <path d="M 30 220 A 170 170 0 0 1 370 220" stroke="#ef4444" />
+        <path d="M 36 220 A 164 164 0 0 1 364 220" stroke="#f97316" />
+        <path d="M 42 220 A 158 158 0 0 1 358 220" stroke="#eab308" />
+        <path d="M 48 220 A 152 152 0 0 1 352 220" stroke="#22c55e" />
+        <path d="M 54 220 A 146 146 0 0 1 346 220" stroke="#3b82f6" />
+      </g>
+    `)
+  }
+
+  // Dog / Puppy (কুকুর / kukur / dog)
+  if (/কুকুর|ছানা|\bkukur\b|\bdog\b|\bpuppy\b/.test(fullText)) {
+    parts.push(`
+      <g id="custom-dog" transform="translate(56, 392)" stroke="#1a1423" stroke-width="2.4">
+        <ellipse cx="26" cy="24" rx="22" ry="13" fill="#d97706" />
+        <circle cx="46" cy="12" r="12" fill="#d97706" />
+        <ellipse cx="42" cy="6" rx="5" ry="9" fill="#92400e" transform="rotate(-20 42 6)" />
+        <circle cx="50" cy="10" r="2.2" fill="#1a1423" />
+        <circle cx="56" cy="13" r="3" fill="#1a1423" />
+        <path d="M 6 20 Q -6 8 2 4" fill="none" stroke="#d97706" stroke-width="4" stroke-linecap="round" />
+        <line x1="14" y1="35" x2="12" y2="48" stroke="#1a1423" stroke-width="3.5" stroke-linecap="round" />
+        <line x1="22" y1="35" x2="22" y2="48" stroke="#1a1423" stroke-width="3.5" stroke-linecap="round" />
+        <line x1="34" y1="35" x2="36" y2="48" stroke="#1a1423" stroke-width="3.5" stroke-linecap="round" />
+        <line x1="42" y1="35" x2="45" y2="48" stroke="#1a1423" stroke-width="3.5" stroke-linecap="round" />
+      </g>
+    `)
+  }
+
+  // Tree / Mango / Banyan (গাছ / আম / বটগাছ / gach / tree)
+  if (/গাছ|আম|বটগাছ|বাগান|\bgach\b|\bgachh\b|\bbagan\b|\btree\b|\bmango\b/.test(fullText)) {
+    parts.push(`
+      <g id="custom-mango-tree" transform="translate(18, 118)" stroke="#1a1423" stroke-width="2.6">
+        <path d="M 28 210 Q 32 140 24 90 L 44 90 Q 38 140 46 210 Z" fill="#78350f" />
+        <circle cx="22" cy="72" r="34" fill="#15803d" />
+        <circle cx="52" cy="68" r="36" fill="#16a34a" />
+        <circle cx="36" cy="42" r="32" fill="#22c55e" />
+        <!-- Ripe Mangoes Hanging -->
+        <ellipse cx="18" cy="82" rx="5" ry="7" fill="#facc15" />
+        <ellipse cx="48" cy="76" rx="5" ry="7" fill="#fb923c" />
+        <ellipse cx="34" cy="58" rx="5" ry="7" fill="#facc15" />
+      </g>
+    `)
+  }
+
+  // Bazar / Market / Shop (বাজার / দোকান / bazar / dokan / market)
+  if (/বাজার|দোকান|হাট|মেলা|\bbazar\b|\bdokan\b|\bhaat\b|\bmela\b|\bmarket\b|\bshop\b/.test(fullText)) {
+    parts.push(`
+      <g id="custom-festive-bunting" stroke="#1a1423" stroke-width="2">
+        <path d="M 10 52 Q 200 95 390 48" fill="none" stroke="#1a1423" stroke-width="2.2" />
+        <polygon points="45,60 65,64 55,86" fill="#f43f5e" />
+        <polygon points="95,68 115,71 105,93" fill="#facc15" />
+        <polygon points="145,73 165,75 155,97" fill="#22c55e" />
+        <polygon points="195,75 215,75 205,97" fill="#38bdf8" />
+        <polygon points="245,73 265,71 255,93" fill="#a855f7" />
+        <polygon points="295,68 315,64 305,86" fill="#fb923c" />
+        <polygon points="345,60 365,55 355,78" fill="#f43f5e" />
+      </g>
+    `)
+  }
+
+  return parts.join('\n')
 }
 
 export function buildSmartDefaultBlueprint(opts: {
@@ -1577,10 +1750,10 @@ export function buildSmartDefaultBlueprint(opts: {
   else if (
     environment === 'dhaka_rooftop' ||
     environment === 'river_nouka' ||
-    /বিকেল|সন্ধ্যা|সূর্যাস্ত|sunset|evening|গোধূলি/.test(fullText)
+    /বিকেল|সন্ধ্যা|সূর্যাস্ত|sunset|evening|গোধূলি|bikel|sondhya/.test(fullText)
   ) {
-    skyTheme = 'golden_sunset'
-  } else if (environment === 'fuchka_cart' || environment === 'hostel_night' || /রাত|night/.test(fullText)) {
+    skyTheme = seed % 2 === 0 ? 'golden_sunset' : 'sunny_dhaka'
+  } else if (environment === 'fuchka_cart' || environment === 'hostel_night' || /রাত|night|\braat\b/.test(fullText)) {
     skyTheme = 'neon_evening'
   } else if (opts.genre === 'action' || detectedPose === 'shocked' || detectedPose === 'angry') {
     skyTheme = 'dramatic_action'
@@ -1589,53 +1762,52 @@ export function buildSmartDefaultBlueprint(opts: {
   let weatherEffect: WeatherEffect = 'sparkles'
   if (environment === 'rainy_street') weatherEffect = 'heavy_rain'
   else if (skyTheme === 'golden_sunset') weatherEffect = 'sunbeams'
-  else if (opts.genre === 'romance' || /প্রেম|ভালোবাসা|গোলাপ|ফুল|romance/.test(fullText))
+  else if (opts.genre === 'romance' || /প্রেম|ভালোবাসা|গোলাপ|ফুল|romance|bhalobasha|prem/.test(fullText))
     weatherEffect = 'romance_petals'
   else if (skyTheme === 'neon_evening') weatherEffect = 'golden_fireflies'
 
   let preset: CharacterStyleId = (opts.characterPreset as CharacterStyleId) || 'rafi'
   if (!opts.characterPreset || opts.characterPreset === 'rafi') {
-    if (/নুসরাত|মেয়ে|আপু|তরুণী|nusrat|girl|woman|she/.test(fullText)) preset = 'nusrat'
-    else if (/অনন্যা|হিজাব|ananya/.test(fullText)) preset = 'ananya'
-    else if (/খালা|মা|আম্মু|ভাবি|khala|mother|aunt/.test(fullText)) preset = 'khala'
-    else if (/দাদি|নানী|dadi|grandma/.test(fullText)) preset = 'dadi'
-    else if (/রিকশা|rickshaw/.test(fullText)) preset = 'rickshaw_mama'
-    else if (/টং|দোকানদার|tong/.test(fullText)) preset = 'cha_mama'
+    if (/নুসরাত|মেয়ে|আপু|তরুণী|nusrat|meye|apu|girl|woman|she/.test(fullText)) preset = 'nusrat'
+    else if (/অনন্যা|হিজাব|ananya|hijab/.test(fullText)) preset = 'ananya'
+    else if (/খালা|মা|আম্মু|ভাবি|khala|ammu|mother|aunt/.test(fullText)) preset = 'khala'
+    else if (/দাদি|নানী|dadi|nani|grandma/.test(fullText)) preset = 'dadi'
+    else if (/রিকশা|rickshaw|riksha/.test(fullText)) preset = 'rickshaw_mama'
+    else if (/টং|দোকানদার|tong|cha mama/.test(fullText)) preset = 'cha_mama'
     else if (/স্যার|শিক্ষক|মাস্টার|teacher|sir/.test(fullText)) preset = 'teacher'
-    else if (/গার্ড|দারোয়ান|guard/.test(fullText)) preset = 'guard'
-    else if (/গিটার|গান|ফাহিম|guitar|fahim/.test(fullText)) preset = 'guitarist'
-    else if (/তামিম|বন্ধু|দোস্ত|tamim|friend/.test(fullText)) preset = 'tamim'
+    else if (/গার্ড|দারোয়ান|guard|darowan/.test(fullText)) preset = 'guard'
+    else if (/গিটার|গান|ফাহিম|guitar|fahim|gan/.test(fullText)) preset = 'guitarist'
+    else if (/তামিম|বন্ধু|দোস্ত|tamim|bondhu|dost|friend/.test(fullText)) preset = 'tamim'
   }
 
   let heldProp: HeldProp = 'none'
-  if (/বিরিয়ানি|কাচ্চি|biryani/.test(fullText)) heldProp = 'biryani_plate'
-  else if (/চা|কাপ|tea|cup|coffee/.test(fullText) || environment === 'tong_tea_stall') heldProp = 'tea_cup'
-  else if (/ছাতা|বৃষ্টি|umbrella|rain/.test(fullText) || environment === 'rainy_street') heldProp = 'umbrella'
-  else if (/বই|খাতা|পড়া|পরীক্ষা|book|exam|study/.test(fullText) || environment === 'library_study')
+  if (/বিরিয়ানি|কাচ্চি|biryani|kacchi/.test(fullText)) heldProp = 'biryani_plate'
+  else if (/চা|কাপ|tea|cup|coffee|\bcha\b/.test(fullText) || environment === 'tong_tea_stall') heldProp = 'tea_cup'
+  else if (/ছাতা|বৃষ্টি|umbrella|rain|bristi|chata/.test(fullText) || environment === 'rainy_street')
+    heldProp = 'umbrella'
+  else if (/বই|খাতা|পড়া|পরীক্ষা|book|exam|study|boi|porikkha/.test(fullText) || environment === 'library_study')
     heldProp = 'book'
-  else if (/ফুচকা|চটপটি|fuchka/.test(fullText) || environment === 'fuchka_cart') heldProp = 'fuchka_plate'
+  else if (/ফুচকা|চটপটি|fuchka|chotpoti/.test(fullText) || environment === 'fuchka_cart')
+    heldProp = 'fuchka_plate'
   else if (/গিটার|গান|guitar/.test(fullText)) heldProp = 'guitar'
-  else if (/ব্যাট|ক্রিকেট|cricket|bat/.test(fullText) || environment === 'cricket_field')
+  else if (/ব্যাট|ক্রিকেট|cricket|bat|khela/.test(fullText) || environment === 'cricket_field')
     heldProp = 'cricket_bat'
-  else if (/গোলাপ|ফুল|rose|flower/.test(fullText)) heldProp = 'rose'
-  else if (/ফোন|মোবাইল|সেলফি|phone|mobile/.test(fullText)) heldProp = 'phone'
-  else {
-    const defaultProps: HeldProp[] = ['tea_cup', 'book', 'phone', 'rose']
-    heldProp = defaultProps[seed % defaultProps.length]
-  }
+  else if (/গোলাপ|ফুল|rose|flower|ful|golap/.test(fullText)) heldProp = 'rose'
+  else if (/ফোন|মোবাইল|সেলফি|phone|mobile|selfie/.test(fullText)) heldProp = 'phone'
+  else if (environment === 'river_nouka') heldProp = 'lantern'
 
   let emotionEffect: EmotionEffect = 'none'
   if (detectedPose === 'shocked') emotionEffect = 'shock_bolts'
   else if (detectedPose === 'angry') emotionEffect = 'anger_vein'
   else if (detectedPose === 'thinking') emotionEffect = 'question_marks'
   else if (detectedPose === 'dancing') emotionEffect = 'music_notes'
-  else if (opts.genre === 'romance' || /ভালোবাসা|প্রেম|সুন্দর|love|heart/.test(fullText))
+  else if (opts.genre === 'romance' || /ভালোবাসা|প্রেম|সুন্দর|love|heart|prem/.test(fullText))
     emotionEffect = 'hearts'
   else emotionEffect = 'sparkles'
 
   const isFemale = preset === 'nusrat' || preset === 'ananya' || preset === 'khala' || preset === 'dadi'
   const hasTwoPeople =
-    /দুজনে|দুইজন|বন্ধু|সাথে|রাফি|নুসরাত|আড্ডা|মামা|স্যার|খালা|রিকশা|together|both|friends|and|with/.test(
+    /দুজনে|দুইজন|বন্ধু|সাথে|রাফি|নুসরাত|আড্ডা|মামা|স্যার|খালা|রিকশা|মাঝি|together|both|friends|and|with|bondhu|sathe|majhi/.test(
       fullText
     ) || seed % 2 === 0
 
@@ -1670,22 +1842,26 @@ export function buildSmartDefaultBlueprint(opts: {
     ? femalePalettes[seed % femalePalettes.length]
     : malePalettes[seed % malePalettes.length]
 
-  const foregroundProps: ForegroundPropId[] = ['stray_cat', 'flying_birds', 'fairy_lights']
-  if (/বিরিয়ানি|কাচ্চি|খাবার|biryani|lunch|dinner/.test(fullText)) {
-    foregroundProps.unshift('biryani_table')
-  } else if (environment === 'tong_tea_stall' || /চা|সিঙ্গারা|টং|tea/.test(fullText)) {
-    foregroundProps.unshift('tea_table')
+  const foregroundProps: ForegroundPropId[] = ['flying_birds']
+  if (environment === 'river_nouka') {
+    foregroundProps.push('clay_lanterns')
+  } else if (/বিরিয়ানি|কাচ্চি|খাবার|biryani|lunch|dinner/.test(fullText)) {
+    foregroundProps.unshift('biryani_table', 'stray_cat')
+  } else if (environment === 'tong_tea_stall' || /চা|সিঙ্গারা|টং|tea|\bcha\b/.test(fullText)) {
+    foregroundProps.unshift('tea_table', 'stray_cat')
   } else if (environment === 'classroom_exam' || environment === 'library_study') {
-    foregroundProps.unshift('exam_desk')
+    foregroundProps.unshift('exam_desk', 'stack_of_books')
   } else if (environment === 'hostel_night' || environment === 'bedroom_lazy') {
-    foregroundProps.unshift('laptop_study_desk')
-  } else if (environment === 'village_courtyard' || /পিঠা|গ্রাম|pitha/.test(fullText)) {
-    foregroundProps.unshift('village_pitha')
+    foregroundProps.unshift('laptop_study_desk', 'stray_cat')
+  } else if (environment === 'village_courtyard' || /পিঠা|গ্রাম|pitha|gram/.test(fullText)) {
+    foregroundProps.unshift('village_pitha', 'stray_cat')
   } else if (environment === 'dhaka_rooftop') {
     foregroundProps.unshift('rooftop_kites', 'potted_flowers')
   } else {
-    foregroundProps.unshift('potted_flowers')
+    foregroundProps.unshift('potted_flowers', 'stray_cat')
   }
+
+  const customSvgElements = buildCustomMidgroundSvgFromText(fullText, environment, seed)
 
   return {
     skyTheme,
@@ -1700,7 +1876,9 @@ export function buildSmartDefaultBlueprint(opts: {
             ? 'বাংলা ক্লাস • পরীক্ষা'
             : environment === 'dhaka_bus'
               ? 'ঢাকা মেট্রো বাস'
-              : 'ঢাকা বিশ্ববিদ্যালয় ক্যাম্পাস',
+              : environment === 'river_nouka'
+                ? 'পদ্মা নদীর ঘাট'
+                : 'ঢাকা বিশ্ববিদ্যালয় ক্যাম্পাস',
     primaryCharacter: {
       preset,
       pose: detectedPose,
@@ -1735,6 +1913,7 @@ export function buildSmartDefaultBlueprint(opts: {
       heldProp: heldProp === 'tea_cup' ? 'tea_cup' : 'none',
     },
     foregroundProps,
+    customSvgElements,
   }
 }
 

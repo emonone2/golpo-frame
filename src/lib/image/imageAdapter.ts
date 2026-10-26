@@ -181,87 +181,95 @@ export class LocalModelImageAdapter implements ImageGeneratorAdapter {
 
 export function detectSetting(scene: string = '', dialogue: string = ''): ComicSetting {
   const text = `${scene} ${dialogue}`.toLowerCase()
-  if (/বৃষ্টি|বাদল|মেঘ|বন্যা|ঝড়|rain|monsoon|umbrella|puddle|storm|dark clouds/.test(text)) {
-    return 'rain'
-  }
-  if (/রিকশা|রিকশাওয়ালা|প্যাডেল|হুড|ভাড়া|rickshaw|hood|fare|pedal/.test(text)) {
-    return 'rickshaw'
-  }
-  if (/লাইব্রেরি|বই|পড়াশোনা|লাইব্রেরিয়ান|library|bookshelf|silence|studying/.test(text)) {
-    return 'library'
-  }
-  if (/টিএসসি|বটতলা|আড্ডা|tsc|bottola|circle|adda/.test(text)) {
-    return 'tsc'
-  }
-  if (/মাঠ|খেলা|ক্রিকেট|ফুটবল|ফিল্ড|field|cricket|football|ground|sports/.test(text)) {
-    return 'field'
-  }
-  if (/বাস|সিট|কন্ডাকটর|জ্যাম|bus|passenger|conductor|traffic jam|local bus/.test(text)) {
-    return 'bus'
-  }
-  if (/ফুচকা|চটপটি|টক|তেঁতুল|ঝাল|fuchka|chotpoti|sour|tamarind|puchka/.test(text)) {
-    return 'fuchka'
-  }
-  if (/নদী|নৌকা|ঘাট|কাশফুল|মাঝি|river|boat|ghat|kashful|shurjo/.test(text)) {
+  if (
+    /নদী|নৌকা|ঘাট|কাশফুল|মাঝি|পদ্মা|পানি|সাগর|পুকুর|হাওর|বিল|\bnodi\b|\bnouka\b|\bghat\b|\bmajhi\b|\bpadma\b|\bpani\b|\bsagor\b|\bpukur\b|\bhaor\b|\bbil\b|\briver\b|\bboat\b|\bkashful\b|\bshurjo\b/.test(
+      text
+    )
+  ) {
     return 'river'
   }
-  if (/পরীক্ষা|কুইজ|হল|ক্লাস|বোর্ড|নম্বর|exam|quiz|test|paper|hall|class|blackboard|marks/.test(text)) {
+  if (
+    /বৃষ্টি|বাদল|মেঘ|বন্যা|ঝড়|ছাতা|\bbristi\b|\bbrishti\b|\bmegh\b|\bjhor\b|\bchhata\b|\bchata\b|\brain\b|\bmonsoon\b|\bumbrella\b|\bpuddle\b|\bstorm\b/.test(
+      text
+    )
+  ) {
+    return 'rain'
+  }
+  if (/রিকশা|রিকশাওয়ালা|প্যাডেল|হুড|ভাড়া|\brickshaw\b|\briksha\b|\bhood\b|\bfare\b|\bpedal\b/.test(text)) {
+    return 'rickshaw'
+  }
+  if (/লাইব্রেরি|বই|পড়াশোনা|লাইব্রেরিয়ান|\blibrary\b|\bbookshelf\b|\bsilence\b|\bstudying\b|\bboi\b/.test(text)) {
+    return 'library'
+  }
+  if (/টিএসসি|বটতলা|আড্ডা|বাজার|হাট|\btsc\b|\bbottola\b|\bcircle\b|\badda\b|\bbazar\b|\bhaat\b/.test(text)) {
+    return 'tsc'
+  }
+  if (/মাঠ|খেলা|ক্রিকেট|ফুটবল|ফিল্ড|\bmath\b|\bkhela\b|\bfield\b|\bcricket\b|\bfootball\b|\bground\b|\bsports\b/.test(text)) {
+    return 'field'
+  }
+  if (/বাস|সিট|কন্ডাকটর|জ্যাম|রাস্তা|\bbus\b|\bpassenger\b|\bconductor\b|\btraffic\b|\bjam\b|\brasta\b/.test(text)) {
+    return 'bus'
+  }
+  if (/ফুচকা|চটপটি|টক|তেঁতুল|ঝাল|\bfuchka\b|\bphuchka\b|\bchotpoti\b|\bsour\b|\btamarind\b|\bpuchka\b/.test(text)) {
+    return 'fuchka'
+  }
+  if (/পরীক্ষা|কুইজ|হল|ক্লাস|বোর্ড|নম্বর|স্কুল|\bporikkha\b|\bexam\b|\bquiz\b|\btest\b|\bpaper\b|\bhall\b|\bclass\b|\bblackboard\b|\bschool\b/.test(text)) {
     return 'classroom'
   }
-  if (/ক্যাম্পাস|কার্জন|বিশ্ববিদ্যালয়|গাছ|রাস্তা|campus|curzon|university|college|pathway|tree/.test(text)) {
-    return 'campus'
-  }
-  if (/ঘুমানো|বিছানা|রুম|সোফা|মুভি|movie|bed|sleep|blanket|couch|couch potato|room|sofa/.test(text)) {
+  if (/ঘুমানো|বিছানা|রুম|সোফা|মুভি|ঘর|বাসা|\bghor\b|\bbasha\b|\bghum\b|\bmovie\b|\bbed\b|\bsleep\b|\bblanket\b|\bcouch\b|\broom\b|\bsofa\b/.test(text)) {
     return 'bedroom'
   }
-  if (/হোস্টেল|ল্যাপটপ|ব্যাটারি|রাত|টেবিল|hostel|laptop|battery|midnight|desk lamp/.test(text)) {
+  if (/হোস্টেল|ল্যাপটপ|ব্যাটারি|রাত|টেবিল|\bhostel\b|\blaptop\b|\bbattery\b|\bmidnight\b|\braat\b/.test(text)) {
     return 'hostel'
   }
-  if (/ক্যান্টিন|চা|সিঙ্গারা|টং|খাবার|বিরিয়ানি|নাস্তা|canteen|biryani|tea|stall|sugar|snack|food|plate/.test(text)) {
+  if (/ক্যান্টিন|চা|সিঙ্গারা|টং|খাবার|বিরিয়ানি|নাস্তা|\bcha\b|\btong\b|\bcanteen\b|\bbiryani\b|\btea\b|\bstall\b|\bsnack\b|\bfood\b/.test(text)) {
     return 'canteen'
   }
-  if (/গেট|দৌড়|দেরি|গার্ড|তাড়াহুড়ো|gate|dash|guard|alarm|corridor|late|sprint/.test(text)) {
+  if (/গেট|দৌড়|দেরি|গার্ড|তাড়াহুড়ো|\bgate\b|\bdash\b|\bguard\b|\balarm\b|\blate\b|\bsprint\b|\bdour\b/.test(text)) {
     return 'gate'
   }
-  if (/ছাদ|রুপকথা|rooftop|roof|lightning|kingdom/.test(text)) {
+  if (/ছাদ|রুপকথা|ঘুড়ি|\bchhad\b|\bchad\b|\bghuri\b|\brooftop\b|\broof\b|\bkite\b/.test(text)) {
     return 'rooftop'
+  }
+  if (/ক্যাম্পাস|কার্জন|বিশ্ববিদ্যালয়|গাছ|রাস্তা|\bcampus\b|\bcurzon\b|\buniversity\b|\bcollege\b|\bpathway\b|\btree\b/.test(text)) {
+    return 'campus'
   }
   return 'campus'
 }
 
 export function detectPose(scene: string = '', dialogue: string = ''): CharacterPose {
   const text = `${scene} ${dialogue}`.toLowerCase()
-  if (/ভাবনা|চিন্তা|ভাবছি|কেন|হিসাব|think|ponder|wonder|idea|hmm|question/.test(text)) {
+  if (/ভাবনা|চিন্তা|ভাবছি|কেন|হিসাব|\bchinta\b|\bbhabchi\b|\bthink\b|\bponder\b|\bwonder\b|\bidea\b|\bhmm\b|\bquestion\b/.test(text)) {
     return 'thinking'
   }
-  if (/রাগ|রেগে|চিৎকার|ধমক|ঘুষি|angry|rage|furious|shout|yell|mad/.test(text)) {
+  if (/রাগ|রেগে|চিৎকার|ধমক|ঘুষি|\brag\b|\brege\b|\bangry\b|\brage\b|\bfurious\b|\bshout\b|\byell\b|\bmad\b/.test(text)) {
     return 'angry'
   }
-  if (/কান্না|চোখের পানি|কাঁদছে|হায় হায়|cry|tears|sob|weep|sad|heartbreak/.test(text)) {
+  if (/কান্না|চোখের পানি|কাঁদছে|হায় হায়|\bkanna\b|\bkandche\b|\bcry\b|\btears\b|\bsob\b|\bweep\b|\bsad\b/.test(text)) {
     return 'crying'
   }
-  if (/ফিসফিস|গোপন|কাউকে বলিস না|কানে কানে|whisper|secret|hush|quietly/.test(text)) {
+  if (/ফিসফিস|গোপন|কাউকে বলিস না|কানে কানে|\bgopon\b|\bwhisper\b|\bsecret\b|\bhush\b|\bquietly\b/.test(text)) {
     return 'whispering'
   }
-  if (/নাচ|গান|বিজয়|উল্লাস|dance|groove|music|sing|celebrate|rock/.test(text)) {
+  if (/নাচ|গান|বিজয়|উল্লাস|\bnach\b|\bgan\b|\bdance\b|\bgroove\b|\bmusic\b|\bsing\b/.test(text)) {
     return 'dancing'
   }
-  if (/আতঙ্ক|কি|শক|চোখ|ভয়|shock|freeze|panic|what|upside down|eyes|terror|wide/.test(text)) {
+  if (/আতঙ্ক|কি|শক|চোখ|ভয়|অবাক|\bobak\b|\bbhoy\b|\bshock\b|\bfreeze\b|\bpanic\b|\bwhat\b|\bterror\b/.test(text)) {
     return 'shocked'
   }
-  if (/দৌড়|ছুট|তাড়া|স্পিড|dash|run|sprint|race|rush|speed|gap/.test(text)) {
+  if (/দৌড়|ছুট|তাড়া|স্পিড|\bdour\b|\bpala\b|\bdash\b|\brun\b|\bsprint\b|\brace\b|\brush\b|\bspeed\b/.test(text)) {
     return 'running'
   }
-  if (/ইয়েস|আনন্দ|পার্টি|হাসি|খুশি|yahoo|delivered|chill|celebrate|cheer|party|yes/.test(text)) {
+  if (/ইয়েস|আনন্দ|পার্টি|হাসি|খুশি|\banondo\b|\bkhushi\b|\byahoo\b|\bcelebrate\b|\bcheer\b|\bparty\b|\byes\b/.test(text)) {
     return 'celebrating'
   }
-  if (/পড়ে|ক্লান্ত|ধপাস|বেহাল|collapse|exhausted|tired|flat|slump|bed/.test(text)) {
+  if (/পড়ে|ক্লান্ত|ধপাস|বেহাল|\bklanto\b|\bcollapse\b|\bexhausted\b|\btired\b|\bflat\b|\bslump\b/.test(text)) {
     return 'collapsed'
   }
-  if (/আত্মবিশ্বাসী|রেডি|হাসি|প্ল্যান|ready|plan|sure|now or never|confident|smile|smirk/.test(text)) {
+  if (/আত্মবিশ্বাসী|রেডি|হাসি|প্ল্যান|\bready\b|\bplan\b|\bsure\b|\bconfident\b|\bsmile\b/.test(text)) {
     return 'confident'
   }
-  if (/বলা|কথা|শোন|অনুরোধ|plead|ask|say|talk|speak|signature|listen/.test(text)) {
+  if (/বলা|কথা|শোন|অনুরোধ|\bplead\b|\bask\b|\bsay\b|\btalk\b|\bspeak\b|\blisten\b/.test(text)) {
     return 'talking'
   }
   return 'idle'

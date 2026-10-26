@@ -324,14 +324,16 @@ export default function Studio({ route }: { route: Route }) {
       .map((s) => (s || '').trim())
       .filter(Boolean)
       .join(' । ')
+    const textSetting = detectSetting(`${panel.scene || ''} ${panel.caption || ''}`, panel.dialogue || '')
     const inferredSetting =
-      panel.setting && panel.setting !== 'campus'
-        ? panel.setting
-        : detectSetting(`${panel.scene || ''} ${panel.caption || ''}`, panel.dialogue || '')
+      combinedSceneText && textSetting !== 'campus'
+        ? textSetting
+        : panel.setting || textSetting
+    const textPose = detectPose(`${panel.scene || ''} ${panel.caption || ''}`, panel.dialogue || '')
     const inferredPose =
-      panel.pose && panel.pose !== 'idle'
-        ? panel.pose
-        : detectPose(`${panel.scene || ''} ${panel.caption || ''}`, panel.dialogue || '')
+      combinedSceneText && textPose !== 'idle'
+        ? textPose
+        : panel.pose || textPose
 
     const adapter = new LocalModelImageAdapter()
     try {
